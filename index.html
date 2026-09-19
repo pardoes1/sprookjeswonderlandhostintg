@@ -1,0 +1,751 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>MagischeHost - Minecraft Hosting</title>
+
+<style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: Arial, sans-serif;
+        background: #0b0d14;
+        color: #fff;
+        min-height: 100vh;
+    }
+
+    /* SIDEBAR */
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 240px;
+        height: 100vh;
+        background: #11141f;
+        border-right: 1px solid #252a3a;
+        padding: 25px 15px;
+    }
+
+    .logo {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 35px;
+        padding-left: 12px;
+    }
+
+    .logo span {
+        color: #9b6cff;
+    }
+
+    .nav a {
+        display: block;
+        text-decoration: none;
+        color: #a9adbd;
+        padding: 13px 15px;
+        border-radius: 9px;
+        margin-bottom: 7px;
+        transition: 0.2s;
+    }
+
+    .nav a:hover,
+    .nav a.active {
+        background: #211b38;
+        color: white;
+    }
+
+    /* MAIN */
+
+    .main {
+        margin-left: 240px;
+        padding: 35px;
+    }
+
+    .topbar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 35px;
+    }
+
+    .topbar h1 {
+        font-size: 30px;
+    }
+
+    .account {
+        background: #171a27;
+        border: 1px solid #292e40;
+        padding: 10px 16px;
+        border-radius: 10px;
+        color: #bbbfd0;
+    }
+
+    /* CARDS */
+
+    .stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 18px;
+        margin-bottom: 30px;
+    }
+
+    .card {
+        background: #11141f;
+        border: 1px solid #252a3a;
+        border-radius: 14px;
+        padding: 22px;
+    }
+
+    .card-title {
+        color: #8e93a7;
+        font-size: 14px;
+        margin-bottom: 10px;
+    }
+
+    .card-value {
+        font-size: 28px;
+        font-weight: bold;
+    }
+
+    /* SERVER */
+
+    .section-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .section-header h2 {
+        font-size: 21px;
+    }
+
+    .button {
+        border: none;
+        background: #8b5cf6;
+        color: white;
+        padding: 11px 18px;
+        border-radius: 9px;
+        cursor: pointer;
+        font-weight: bold;
+    }
+
+    .button:hover {
+        background: #7444dd;
+    }
+
+    .server {
+        background: #11141f;
+        border: 1px solid #252a3a;
+        border-radius: 14px;
+        padding: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+    }
+
+    .server-left {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .server-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        background: #211b38;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+    }
+
+    .server-name {
+        font-size: 17px;
+        font-weight: bold;
+    }
+
+    .server-info {
+        color: #85899b;
+        font-size: 13px;
+        margin-top: 5px;
+    }
+
+    .online {
+        color: #43d17c;
+    }
+
+    .offline {
+        color: #ff5964;
+    }
+
+    .server-actions {
+        display: flex;
+        gap: 8px;
+    }
+
+    .small-button {
+        border: 1px solid #30364b;
+        background: #181b28;
+        color: #ddd;
+        padding: 8px 12px;
+        border-radius: 7px;
+        cursor: pointer;
+    }
+
+    .small-button:hover {
+        background: #252a3b;
+    }
+
+    /* EMPTY */
+
+    .empty {
+        text-align: center;
+        padding: 55px 20px;
+        border: 1px dashed #30364b;
+        border-radius: 14px;
+        color: #777d91;
+    }
+
+    /* MODAL */
+
+    .modal {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.75);
+        align-items: center;
+        justify-content: center;
+        z-index: 10;
+    }
+
+    .modal-box {
+        width: 450px;
+        max-width: 90%;
+        background: #11141f;
+        border: 1px solid #30364b;
+        border-radius: 15px;
+        padding: 25px;
+    }
+
+    .modal-box h2 {
+        margin-bottom: 20px;
+    }
+
+    .input {
+        width: 100%;
+        background: #0b0d14;
+        border: 1px solid #30364b;
+        color: white;
+        padding: 12px;
+        border-radius: 8px;
+        margin-bottom: 14px;
+        outline: none;
+    }
+
+    .input:focus {
+        border-color: #8b5cf6;
+    }
+
+    .modal-buttons {
+        display: flex;
+        gap: 10px;
+        margin-top: 8px;
+    }
+
+    .cancel {
+        background: #242938;
+    }
+
+    /* MOBILE */
+
+    @media(max-width: 800px) {
+
+        .sidebar {
+            width: 70px;
+        }
+
+        .logo {
+            font-size: 0;
+        }
+
+        .logo span {
+            font-size: 22px;
+        }
+
+        .nav a {
+            font-size: 0;
+            text-align: center;
+        }
+
+        .nav a::first-letter {
+            font-size: 20px;
+        }
+
+        .main {
+            margin-left: 70px;
+            padding: 20px;
+        }
+
+        .stats {
+            grid-template-columns: 1fr;
+        }
+
+        .server {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .server-actions {
+            width: 100%;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<!-- SIDEBAR -->
+
+<div class="sidebar">
+
+    <div class="logo">
+        Magische<span>Host</span>
+    </div>
+
+    <div class="nav">
+        <a href="#" class="active">🏠 Dashboard</a>
+        <a href="#">🖥️ Servers</a>
+        <a href="#">⚙️ Settings</a>
+        <a href="#">📦 Backups</a>
+        <a href="#">👤 Account</a>
+    </div>
+
+</div>
+
+
+<!-- MAIN -->
+
+<div class="main">
+
+    <div class="topbar">
+
+        <div>
+            <h1>Dashboard</h1>
+            <p style="color:#85899b;margin-top:5px;">
+                Manage your Minecraft servers
+            </p>
+        </div>
+
+        <div class="account">
+            👤 Guest
+        </div>
+
+    </div>
+
+
+    <!-- STATS -->
+
+    <div class="stats">
+
+        <div class="card">
+            <div class="card-title">SERVERS</div>
+            <div class="card-value" id="serverCount">0</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">ONLINE SERVERS</div>
+            <div class="card-value" id="onlineCount">0</div>
+        </div>
+
+        <div class="card">
+            <div class="card-title">TOTAL RAM</div>
+            <div class="card-value" id="ramCount">0 GB</div>
+        </div>
+
+    </div>
+
+
+    <!-- SERVERS -->
+
+    <div class="section-header">
+
+        <h2>Your Servers</h2>
+
+        <button class="button" onclick="openCreateServer()">
+            + Create Server
+        </button>
+
+    </div>
+
+
+    <div id="servers">
+
+        <div class="empty" id="empty">
+
+            <div style="font-size:40px;margin-bottom:15px;">
+                🖥️
+            </div>
+
+            <h3>No servers yet</h3>
+
+            <p style="margin-top:8px;">
+                Create your first Minecraft server to get started.
+            </p>
+
+            <button
+                class="button"
+                style="margin-top:20px;"
+                onclick="openCreateServer()">
+                Create Server
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- CREATE SERVER MODAL -->
+
+<div class="modal" id="createModal">
+
+    <div class="modal-box">
+
+        <h2>Create Minecraft Server</h2>
+
+        <input
+            class="input"
+            id="serverName"
+            placeholder="Server name">
+
+        <select class="input" id="minecraftVersion">
+
+            <option value="1.21.4">Minecraft 1.21.4</option>
+            <option value="1.21.3">Minecraft 1.21.3</option>
+            <option value="1.21.1">Minecraft 1.21.1</option>
+
+        </select>
+
+        <select class="input" id="software">
+
+            <option value="Paper">Paper</option>
+            <option value="Purpur">Purpur</option>
+            <option value="Vanilla">Vanilla</option>
+
+        </select>
+
+        <select class="input" id="ram">
+
+            <option value="2">2 GB RAM</option>
+            <option value="4">4 GB RAM</option>
+            <option value="6">6 GB RAM</option>
+            <option value="8">8 GB RAM</option>
+
+        </select>
+
+        <div class="modal-buttons">
+
+            <button
+                class="button"
+                onclick="createServer()">
+                Create
+            </button>
+
+            <button
+                class="button cancel"
+                onclick="closeCreateServer()">
+                Cancel
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+let servers = [];
+
+
+/* MODAL */
+
+function openCreateServer() {
+
+    document.getElementById("createModal").style.display = "flex";
+
+}
+
+function closeCreateServer() {
+
+    document.getElementById("createModal").style.display = "none";
+
+}
+
+
+/* CREATE SERVER */
+
+function createServer() {
+
+    const name =
+        document.getElementById("serverName").value.trim();
+
+    const version =
+        document.getElementById("minecraftVersion").value;
+
+    const software =
+        document.getElementById("software").value;
+
+    const ram =
+        document.getElementById("ram").value;
+
+
+    if (!name) {
+
+        alert("Please enter a server name.");
+
+        return;
+
+    }
+
+
+    const server = {
+
+        id: Date.now(),
+
+        name: name,
+
+        version: version,
+
+        software: software,
+
+        ram: Number(ram),
+
+        online: false
+
+    };
+
+
+    servers.push(server);
+
+    closeCreateServer();
+
+    document.getElementById("serverName").value = "";
+
+    renderServers();
+
+}
+
+
+/* RENDER */
+
+function renderServers() {
+
+    const container =
+        document.getElementById("servers");
+
+    const empty =
+        document.getElementById("empty");
+
+
+    if (servers.length === 0) {
+
+        empty.style.display = "block";
+
+        return;
+
+    }
+
+
+    empty.style.display = "none";
+
+
+    container.innerHTML = "";
+
+
+    servers.forEach(server => {
+
+        const div =
+            document.createElement("div");
+
+        div.className = "server";
+
+
+        div.innerHTML = `
+
+            <div class="server-left">
+
+                <div class="server-icon">
+                    ⛏️
+                </div>
+
+                <div>
+
+                    <div class="server-name">
+                        ${escapeHtml(server.name)}
+                    </div>
+
+                    <div class="server-info">
+
+                        ${server.software}
+                        ${server.version}
+                        • ${server.ram} GB RAM
+                        •
+
+                        <span class="${server.online ? "online" : "offline"}">
+                            ${server.online ? "Online" : "Offline"}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="server-actions">
+
+                <button
+                    class="small-button"
+                    onclick="toggleServer(${server.id})">
+
+                    ${server.online ? "■ Stop" : "▶ Start"}
+
+                </button>
+
+                <button
+                    class="small-button"
+                    onclick="serverConsole(${server.id})">
+
+                    Console
+
+                </button>
+
+                <button
+                    class="small-button"
+                    onclick="deleteServer(${server.id})">
+
+                    Delete
+
+                </button>
+
+            </div>
+
+        `;
+
+
+        container.appendChild(div);
+
+    });
+
+
+    updateStats();
+
+}
+
+
+/* START / STOP */
+
+function toggleServer(id) {
+
+    const server =
+        servers.find(s => s.id === id);
+
+    if (!server) return;
+
+    server.online = !server.online;
+
+    renderServers();
+
+}
+
+
+/* DELETE */
+
+function deleteServer(id) {
+
+    if (!confirm("Delete this server?")) return;
+
+    servers =
+        servers.filter(s => s.id !== id);
+
+    renderServers();
+
+}
+
+
+/* CONSOLE */
+
+function serverConsole(id) {
+
+    const server =
+        servers.find(s => s.id === id);
+
+    if (!server) return;
+
+    alert(
+        "Console for " +
+        server.name +
+        "\n\nThe Minecraft node API will be connected here later."
+    );
+
+}
+
+
+/* STATS */
+
+function updateStats() {
+
+    document.getElementById("serverCount")
+        .textContent = servers.length;
+
+
+    document.getElementById("onlineCount")
+        .textContent =
+        servers.filter(s => s.online).length;
+
+
+    const ram =
+        servers.reduce(
+            (total, server) => total + server.ram,
+            0
+        );
+
+
+    document.getElementById("ramCount")
+        .textContent = ram + " GB";
+
+}
+
+
+/* SECURITY */
+
+function escapeHtml(text) {
+
+    const div =
+        document.createElement("div");
+
+    div.textContent = text;
+
+    return div.innerHTML;
+
+}
+
+</script>
+
+</body>
+</html>
+```
